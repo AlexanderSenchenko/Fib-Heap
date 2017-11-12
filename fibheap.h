@@ -33,6 +33,7 @@ Heap* fibheap_union_list(Heap*, Heap*);
 Heap* fibheap_delete_min_node(Heap*);
 Heap* fibheap_consolidate(Heap*);
 void fibheap_swap(Fibheap*, Fibheap*);
+void fibheap_link(Fibheap*, Fibheap*);
 int fibheap_max_degree(Heap*);
 //Litle key
 //Delete node
