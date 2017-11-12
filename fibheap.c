@@ -5,13 +5,11 @@
 
 Heap* heap_memory_allocation(Heap* heap)
 {
-	if (heap == NULL) {
-		heap = malloc(sizeof(Heap));
-		if (heap == NULL)
-			return NULL;
-		heap->min = NULL;
-		heap->amount = 0;
-	}
+	heap = malloc(sizeof(Heap));
+	if (heap == NULL)
+		return NULL;
+	heap->min = NULL;
+	heap->amount = 0;
 	return heap;
 }
 
@@ -90,6 +88,7 @@ Heap* fibheap_union_list(Heap* heap, Heap* heap_b)
 	return heap;
 }
 
+
 Heap* fibheap_delete_min_node(Heap* heap)
 {
 	Fibheap* min = fibheap_min(heap), *node = NULL;
@@ -104,52 +103,85 @@ Heap* fibheap_delete_min_node(Heap* heap)
 		node->parent = NULL;
 	}
 
-	fibheap_delete_node(heap, heap->min);
+	fibheap_delete_node(min);
 
 	if (min == min->right) {
 		return NULL;
 	} else {
 		heap->min = min->right;
-	}
+		heap = fibheap_consolidate(heap);
 
-	//heap->amount--;
+	}
+	heap->amount--;
+
 	return heap;
 }
 
 Heap* fibheap_consolidate(Heap* heap)
 {
-	double degree = fibheap_max_degree(heap);
-	Fibheap *arr_node = malloc(sizeof(Fibheap) * degree);
+	int degree = fibheap_max_degree(heap);
+	Fibheap** arr_node = malloc(sizeof(Fibheap) * degree);
 	Fibheap* node = fibheap_min(heap);
+
 	for (int i = 0; i < degree; i++) {
-		arr_node[i] = node;
+		arr_node[i] = NULL;
 	}
 
+	//while () {
+		if (arr_node[node->degree] == NULL) {
+			arr_node[node->degree] = node;
+		} else {
+			if (arr_node[degree]->key < node->key) {
+				if (arr_node[node->degree]->child != NULL) {
+					fibheap_delete_node(node);
+					fibheap_add_node(node, arr_node[node->degree]->child);
+				} else {
+					arr_node[node->degree]->child = node;
+				}
+				arr_node[node->degree]->degree++;
+				node->parent = arr_node[node->degree];
+			} else {
+				if (arr_node[node->degree]->child != NULL) {
+					fibheap_delete_node(arr_node[node->degree]->child);
+					fibheap_add_node(arr_node[node->degree]->child, node);
+				} else {
+					node->child = arr_node[node->degree];
+				}
+				node->degree++;
+				arr_node[node->degree]->parent = node;
+				arr_node[node->degree] = node;
+			}
+			arr_node[node->degree]->degree++;
 
 
-	if (arr_node[node->degree] == NULL) {
-		arr_node[node->degree] = node;
-	} else {
-		if (arr_node[node->degree]->key < node->key) {
-			printf("\n");
 		}
-	}
+		node = node->right;
+	//}
 
 	return heap;
 }
 
-double fibheap_max_degree(Heap* heap)
+void fibheap_swap(Fibheap* node_a, Fibheap* node_b)
 {
-	double degree = log(heap->amount);
-	return degree;
+	node_a->right = node_b->right;
+	node_a->right->left = node_a;
+	node_b->left = node_a->left;
+	node_b->left->right = node_b;
+	node_a->left = node_b;
+	node_b->right = node_a; 
 }
 
-void fibheap_delete_node(Heap* heap, Fibheap* node)
+int fibheap_max_degree(Heap* heap)
+{
+	return round(log(heap->amount));
+}
+
+void fibheap_delete_node(Fibheap* node)
 {
 	node->left->right = node->right;
 	node->right->left = node->left;
-	heap->amount--;
-	free(node);
+	//heap->amount--;
+	//free(node);
 }
 
 void fibheap_print(Heap* heap)
