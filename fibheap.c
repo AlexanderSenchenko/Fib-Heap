@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <math.h>
 
-Heap* heap_memory_allocation(Heap* heap)
+Heap* heap_memory_allocation()
 {
-	heap = malloc(sizeof(Heap));
+	Heap* heap = malloc(sizeof(Heap));
 	if (heap == NULL)
 		return NULL;
 	heap->min = NULL;
@@ -147,6 +147,7 @@ Heap* fibheap_consolidate(Heap* heap)
 					node->left = node;
 					node->right = node;
 					arr_node[n_degree]->degree++;
+					node->parent = arr_node[n_degree];
 				}
 				node = arr_node[n_degree];
 			} else {
@@ -158,6 +159,7 @@ Heap* fibheap_consolidate(Heap* heap)
 					arr_node[n_degree]->left = arr_node[n_degree];
 					arr_node[n_degree]->right = arr_node[n_degree];
 					node->degree++;
+					arr_node[n_degree]->parent = node;
 				}
 			}
 			arr_node[n_degree] = NULL;
@@ -184,12 +186,60 @@ void fibheap_link(Fibheap* node, Fibheap* child)
 	fibheap_delete_node_from_list(child);
 	child->parent = node;
 	fibheap_add_node(child, node->child);
-	//chield->mark = FALSE;
+	child->mark = 0;
 }
 
 int fibheap_max_degree(Heap* heap)
 {
 	return floor(log(heap->amount));
+}
+
+void fibheap_decrease_key(Heap* heap, Fibheap* node, int new_key)
+{
+	Fibheap* parent = node->parent;
+	if (node->key < new_key)
+		return;
+	node->key = new_key;
+	if (parent != NULL && parent->key > node->key) {
+		fibheap_cut(heap, node, parent);
+		fibheap_cascading_cut(heap, parent);
+	}
+	if (heap->min == NULL || node->key < heap->min->key) {
+		heap->min = node;
+	}
+}
+
+void fibheap_cut(Heap* heap, Fibheap* node_c, Fibheap* node_p)
+{
+	if (node_c == node_p->child && node_c != node_c->right) {
+		node_p->child = node_c->right;
+	} else {
+		node_p->child = NULL;
+	}
+
+	node_c->left->right = node_c->right;
+	node_c->right->left = node_c->left;
+
+	node_c->right = heap->min;
+	node_c->left = heap->min->left;
+	heap->min->left->right = node_c;
+	heap->min->left = node_c;
+
+	node_c->parent = NULL;
+	node_p->degree--;
+	node_c->mark = 0;
+}
+
+void fibheap_cascading_cut(Heap* heap, Fibheap* node)
+{
+	if (node->parent == NULL)
+		return;
+	if (node->mark == 0) {
+		node->mark = 1;
+	} else {
+		fibheap_cut(heap, node, node->parent);
+		fibheap_cascading_cut(heap, node->parent);
+	}
 }
 
 void fibheap_delete_node_from_list(Fibheap* node)

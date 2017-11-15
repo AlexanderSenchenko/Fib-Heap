@@ -5,8 +5,7 @@
 int main(int argc, char *argv[])
 {
 	printf("Heap\n");
-	Heap *heap = NULL;
-	heap = heap_memory_allocation(heap);
+	Heap *heap = heap_memory_allocation();
 	if (heap == NULL)
 		return 0;
 	heap = fibheap_insert(heap, 3, 3);
@@ -30,6 +29,17 @@ int main(int argc, char *argv[])
 	fibheap_print(heap_c->min);
 
 	printf("Delete min node\n");
+	heap_c = fibheap_delete_min_node(heap_c);
+	fibheap_print(heap_c->min);
+
+	printf("Decreasw key\n");
+	fibheap_decrease_key(heap_c, heap_c->min->right->child, 4);
+	fibheap_print(heap_c->min);
+	fibheap_decrease_key(heap_c, heap_c->min->right->child, 4);
+	fibheap_print(heap_c->min);
+	fibheap_decrease_key(heap_c, heap_c->min->left->child, 1);
+	fibheap_print(heap_c->min);
+
 	heap_c = fibheap_delete_min_node(heap_c);
 	fibheap_print(heap_c->min);
 
