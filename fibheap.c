@@ -248,6 +248,12 @@ void fibheap_delete_node_from_list(Fibheap* node)
 	node->right->left = node->left;
 }
 
+void fibheap_delete_node(Heap* heap, Fibheap* node)
+{
+	fibheap_decrease_key(heap, node, -1);
+	fibheap_delete_min_node(heap);
+}
+
 void fibheap_print(Fibheap* min)
 {
 	printf("<");

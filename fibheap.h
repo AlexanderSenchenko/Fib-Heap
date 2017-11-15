@@ -42,7 +42,7 @@ void fibheap_decrease_key(Heap*, Fibheap*, int);
 void fibheap_cut(Heap*, Fibheap*, Fibheap*);
 void fibheap_cascading_cut(Heap*, Fibheap*);
 //
-
+void fibheap_delete_node(Heap*, Fibheap*);
 //
 void fibheap_print(Fibheap*);
 

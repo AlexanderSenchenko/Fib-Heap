@@ -43,5 +43,9 @@ int main(int argc, char *argv[])
 	heap_c = fibheap_delete_min_node(heap_c);
 	fibheap_print(heap_c->min);
 
+	printf("Delete node\n");
+	fibheap_delete_node(heap_c, heap_c->min->child);
+	fibheap_print(heap_c->min);
+
 	return 0;
 }
